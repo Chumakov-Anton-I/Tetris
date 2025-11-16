@@ -10,27 +10,34 @@ class Figure
 {
 public:
     enum Shape {
-        ShapeO,
         ShapeI,
-        ShapeS,
-        ShapeZ,
-        ShapeL,
         ShapeJ,
+        ShapeL,
+        ShapeO,
+        ShapeS,
         ShapeT,
-        UndefinedShape
+        ShapeZ
     };
-    Figure(CMap *map);
-    virtual ~Figure() {}
+    enum Dir {
+        North,
+        East,
+        South,
+        West
+    };
+
+    Figure(CMap *map, Figure::Shape shape);
+    //virtual ~Figure() {}
 
     void moveL();
     void moveR();
     bool moveDown();
-    virtual void rotate();
+    void rotate();
 
     bool isValid() const { return m_state; };
 
 protected:
     void spawn();
+    Figure::Shape m_type;
     CMap *m_map;
     static const int count = 4;
     QPoint m_pos;
@@ -38,6 +45,7 @@ protected:
     QRgb m_color;
     bool m_state;
 
+    void setShape(Figure::Shape shape);
     void clearFig();
     void fillFig();
     bool tryToLay(const QPoint &pos);

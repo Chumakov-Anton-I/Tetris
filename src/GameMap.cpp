@@ -1,17 +1,11 @@
 #include "GameMap.h"
 #include "CMap.h"
-#include "OFigure.h"
-#include "IFigure.h"
-#include "SFigure.h"
-#include "ZFigure.h"
-#include "LFigure.h"
-#include "JFigure.h"
-#include "TFigure.h"
+#include "Figure.h"
+#include "RandBlock.h"
 
 #include <QPixmap>
 #include <QMargins>
 #include <QKeyEvent>
-#include <random>
 
 GameMap::GameMap(QWidget *parent)
     : QWidget{parent}
@@ -21,6 +15,8 @@ GameMap::GameMap(QWidget *parent)
     m_figure = nullptr;
     m_map = new CMap(m_width, m_height);
     m_pixmap = new QPixmap(m_width*m_cellSize, m_height*m_cellSize);
+
+    m_random = new RandBlock(Figure::ShapeI, Figure::ShapeZ);
 
     setFixedSize(m_pixmap->size());
     connect(&m_timer, &QTimer::timeout, this, QOverload<>::of(&GameMap::updateMap));
@@ -32,6 +28,7 @@ GameMap::~GameMap()
 {
     delete m_map;
     delete m_pixmap;
+    delete m_random;
 }
 
 void GameMap::paintEvent(QPaintEvent *event)
@@ -148,34 +145,10 @@ void GameMap::onReset()
 
 void GameMap::createFigure()
 {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> distrib(0, 6);
-    switch (distrib(gen)) {
-    case 0:
-        m_figure = new OFigure(m_map);
-        break;
-    case 1:
-        m_figure = new IFigure(m_map);
-        break;
-    case 2:
-        m_figure = new SFigure(m_map);
-        break;
-    case 3:
-        m_figure = new ZFigure(m_map);
-        break;
-    case 4:
-        m_figure = new LFigure(m_map);
-        break;
-    case 5:
-        m_figure = new JFigure(m_map);
-        break;
-    case 6:
-        m_figure = new TFigure(m_map);
-        break;
-    default:
-        break;
-    }
+    //std::random_device rd;
+    //std::mt19937 gen(rd());
+    //std::uniform_int_distribution<> distrib(Figure::ShapeI, Figure::ShapeZ);
+    m_figure = new Figure(m_map, Figure::Shape(m_random->rand()));
 }
 
 void GameMap::updateMap()
@@ -185,7 +158,8 @@ void GameMap::updateMap()
         return;
     }
     if (!m_figure) {    // spawn figure if is doesn't exist
-        createFigure();
+        //createFigure();
+        m_figure = new Figure(m_map, Figure::Shape(m_random->rand()));
         if (!m_figure->isValid()) {
             m_timer.stop();
             delete m_figure;
