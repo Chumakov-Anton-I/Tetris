@@ -16,16 +16,22 @@ public:
         ShapeO,
         ShapeS,
         ShapeT,
-        ShapeZ,
-        UndefinedShape
+        ShapeZ
     };
-    Figure(CMap *map);
-    virtual ~Figure() {}
+    enum Dir {
+        North,
+        East,
+        South,
+        West
+    };
+
+    Figure(CMap *map, Figure::Shape shape);
+    //virtual ~Figure() {}
 
     void moveL();
     void moveR();
     bool moveDown();
-    virtual void rotate();
+    void rotate();
 
     bool isValid() const { return m_state; };
 
@@ -39,6 +45,7 @@ protected:
     QRgb m_color;
     bool m_state;
 
+    void setShape(Figure::Shape shape);
     void clearFig();
     void fillFig();
     bool tryToLay(const QPoint &pos);

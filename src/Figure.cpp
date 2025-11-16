@@ -1,9 +1,13 @@
 #include "Figure.h"
 #include "CMap.h"
 
-Figure::Figure(CMap *map)
-    : m_map{map}, m_state{true}
+Figure::Figure(CMap *map, Figure::Shape shape)
+    : m_map{map}, m_type{shape}, m_state{true}
 {
+    setShape(shape);
+    m_state = tryToLay(m_pos);
+    if (m_state)
+        fillFig();
 }
 
 void Figure::moveL()
@@ -41,6 +45,8 @@ bool Figure::moveDown()
 
 void Figure::rotate()
 {
+    if (m_type == Figure::ShapeO)
+        return;
     for (int i = 0; i < count; ++i) {
         m_map->kill(offset[i] + m_pos);
         offset[i] = QPoint(-offset[i].y(), offset[i].x());  // rotate (x, y) --> (-y, x)
@@ -77,6 +83,68 @@ void Figure::spawn()
     if (!m_state)   // couldn't create figure
         return;
     fillFig();
+}
+
+void Figure::setShape(Shape shape)
+{
+    switch (shape) {
+    case Figure::ShapeI:
+        m_pos = QPoint(4, 0);
+        offset[0] = QPoint(-1, 0);
+        offset[1] = QPoint( 0, 0);
+        offset[2] = QPoint( 1, 0);
+        offset[3] = QPoint( 2, 0);
+        m_color = qRgb(255, 127, 0);    // orange
+        break;
+    case Figure::ShapeJ:
+        m_pos = QPoint(4, 1);
+        offset[0] = QPoint(-1, -1);
+        offset[1] = QPoint(-1,  0);
+        offset[2] = QPoint( 0,  0);
+        offset[3] = QPoint( 1,  0);
+        m_color = qRgb(255, 0, 255);    // magenta
+        break;
+    case Figure::ShapeL:
+        m_pos = QPoint(4, 1);
+        offset[0] = QPoint(-1,  0);
+        offset[1] = QPoint( 0,  0);
+        offset[2] = QPoint( 1,  0);
+        offset[3] = QPoint( 1, -1);
+        m_color = qRgb(0, 0, 255);    // blue
+        break;
+    case Figure::ShapeO:
+        m_pos = QPoint(4, 0);
+        offset[0] = QPoint( 0, 0);
+        offset[1] = QPoint( 1, 0);
+        offset[2] = QPoint( 1, 1);
+        offset[3] = QPoint( 0, 1);
+        m_color = qRgb(255, 0, 0);  // pure red
+        break;
+    case Figure::ShapeS:
+        m_pos = QPoint(4, 1);
+        offset[0] = QPoint(-1,  0);
+        offset[1] = QPoint( 0,  0);
+        offset[2] = QPoint( 0, -1);
+        offset[3] = QPoint( 1, -1);
+        m_color = qRgb(0, 255, 255);    // cyan
+        break;
+    case Figure::ShapeT:
+        m_pos = QPoint(4, 1);
+        offset[0] = QPoint(-1,  0);
+        offset[1] = QPoint( 0,  0);
+        offset[2] = QPoint( 1,  0);
+        offset[3] = QPoint( 0, -1);
+        m_color = qRgb(255, 255, 0);    // yellow
+        break;
+    case Figure::ShapeZ:
+        m_pos = QPoint(4, 1);
+        offset[0] = QPoint(-1, -1);
+        offset[1] = QPoint( 0, -1);
+        offset[2] = QPoint( 0,  0);
+        offset[3] = QPoint( 1,  0);
+        m_color = qRgb(0, 255, 0);    // green
+        break;
+    }
 }
 
 void Figure::clearFig()

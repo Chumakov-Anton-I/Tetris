@@ -18,13 +18,6 @@ set(SRC_FILES
     src/GameMap.h src/GameMap.cpp
     src/CMap.h src/CMap.cpp
     src/Figure.h src/Figure.cpp
-    src/OFigure.h src/OFigure.cpp
-    src/IFigure.h src/IFigure.cpp
-    src/SFigure.h src/SFigure.cpp
-    src/ZFigure.h src/ZFigure.cpp
-    src/LFigure.h src/LFigure.cpp
-    src/JFigure.h src/JFigure.cpp
-    src/TFigure.h src/TFigure.cpp
     src/RandBlock.h src/RandBlock.cpp
 )
 

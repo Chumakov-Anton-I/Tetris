@@ -7,6 +7,7 @@
 
 class CMap;
 class Figure;
+class RandBlock;
 
 class GameMap : public QWidget
 {
@@ -48,6 +49,8 @@ private:
     QPainter m_painter;
     QPixmap *m_pixmap;
     Figure *m_figure;
+
+    RandBlock *m_random;
 
     void createFigure();
 
