@@ -10,13 +10,13 @@ class Figure
 {
 public:
     enum Shape {
-        ShapeO,
         ShapeI,
-        ShapeS,
-        ShapeZ,
-        ShapeL,
         ShapeJ,
+        ShapeL,
+        ShapeO,
+        ShapeS,
         ShapeT,
+        ShapeZ,
         UndefinedShape
     };
     Figure(CMap *map);
@@ -31,6 +31,7 @@ public:
 
 protected:
     void spawn();
+    Figure::Shape m_type;
     CMap *m_map;
     static const int count = 4;
     QPoint m_pos;
