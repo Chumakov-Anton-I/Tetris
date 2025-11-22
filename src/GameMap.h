@@ -23,7 +23,6 @@ signals:
 
 protected:
     void paintEvent(QPaintEvent *event);
-    bool eventFilter(QObject *object, QEvent *event);
 
 public:
     void moveLeft();
@@ -44,15 +43,13 @@ private:
     unsigned long m_score;
     int m_level;
     bool m_gameOver;
+    bool m_gamePause;
     CMap *m_map;
     QTimer m_timer;
     QPainter m_painter;
     QPixmap *m_pixmap;
     Figure *m_figure;
-
     RandBlock *m_random;
-
-    void createFigure();
 
 private slots:
     void updateMap();

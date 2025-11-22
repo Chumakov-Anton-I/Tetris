@@ -29,6 +29,7 @@ GameMap::~GameMap()
     delete m_map;
     delete m_pixmap;
     delete m_random;
+    delete m_figure;
 }
 
 void GameMap::paintEvent(QPaintEvent *event)
@@ -49,43 +50,21 @@ void GameMap::paintEvent(QPaintEvent *event)
         m_painter.setPen(Qt::white);
         m_painter.drawText(m_pixmap->rect(), Qt::AlignCenter, tr("Game Over!"));
     }
+    if (m_gamePause) {
+        m_painter.fillRect(m_pixmap->rect(), QColor(90, 90, 90, 190));
+        m_painter.setFont(QFont("Verdana", 16, 60));
+        m_painter.setPen(Qt::white);
+        m_painter.drawText(m_pixmap->rect(), Qt::AlignCenter, tr("Pause"));
+    }
     m_painter.end();
     m_painter.begin(this);
     m_painter.drawPixmap(0, 0, *m_pixmap);
     m_painter.end();
 }
 
-bool GameMap::eventFilter(QObject *object, QEvent *event)
-{
-    if (m_timer.isActive() && event->type() == QEvent::KeyPress) {
-        auto *kevent = static_cast<QKeyEvent *>(event);
-        bool rv = true;
-        switch (kevent->key()) {
-        case Qt::Key_Left:
-            moveLeft();
-            break;
-        case Qt::Key_Right:
-            moveRight();
-            break;
-        case Qt::Key_Up:
-            rotate();
-            break;
-        case Qt::Key_Down:
-            drop();
-            break;
-        default:
-            rv = false;
-            break;
-        }
-        return rv;
-    }
-    else
-        return QWidget::eventFilter(object, event);
-}
-
 void GameMap::moveLeft()
 {
-    if (m_figure) {
+    if (m_figure && m_timer.isActive()) {
         m_figure->moveL();
         update();
     }
@@ -93,7 +72,7 @@ void GameMap::moveLeft()
 
 void GameMap::moveRight()
 {
-    if (m_figure) {
+    if (m_figure && m_timer.isActive()) {
         m_figure->moveR();
         update();
     }
@@ -101,7 +80,7 @@ void GameMap::moveRight()
 
 void GameMap::drop()
 {
-    if (m_figure) {
+    if (m_figure && m_timer.isActive()) {
         m_figure->moveDown();
         update();
     }
@@ -109,7 +88,7 @@ void GameMap::drop()
 
 void GameMap::rotate()
 {
-    if (m_figure) {
+    if (m_figure && m_timer.isActive()) {
         m_figure->rotate();
         update();
     }
@@ -117,13 +96,18 @@ void GameMap::rotate()
 
 void GameMap::onStart()
 {
-    if (!m_gameOver)
+    if (!m_gameOver) {
+        m_gamePause = false;
+        update();
         m_timer.start(m_timeout);
+    }
 }
 
 void GameMap::onStop()
 {
+    m_gamePause = true;
     m_timer.stop();
+    update();
 }
 
 void GameMap::onReset()
@@ -138,17 +122,10 @@ void GameMap::onReset()
     m_score = 0ul;
     m_level = 0;
     m_gameOver = false;
+    m_gamePause = false;
     emit scoreUp(m_score);
     emit levelUp(m_level);
     update();
-}
-
-void GameMap::createFigure()
-{
-    //std::random_device rd;
-    //std::mt19937 gen(rd());
-    //std::uniform_int_distribution<> distrib(Figure::ShapeI, Figure::ShapeZ);
-    m_figure = new Figure(m_map, Figure::Shape(m_random->rand()));
 }
 
 void GameMap::updateMap()
@@ -158,7 +135,6 @@ void GameMap::updateMap()
         return;
     }
     if (!m_figure) {    // spawn figure if is doesn't exist
-        //createFigure();
         m_figure = new Figure(m_map, Figure::Shape(m_random->rand()));
         if (!m_figure->isValid()) {
             m_timer.stop();
